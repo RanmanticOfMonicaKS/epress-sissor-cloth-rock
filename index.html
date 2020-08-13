@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>剪刀石头布</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+        }
+
+        .result {
+            width: 300px;
+            height: 300px;
+            background-color: #ccc;
+        }
+
+    </style>
+</head>
+
+<body>
+    <div class="result">
+        <ul>
+
+        </ul>
+    </div>
+    <button style="width:50px;" class="scissor">剪刀</button>
+    <button style="width:50px;" class="rock">石头</button>
+    <button style="width:50px;" class="cloth">布</button>
+    <button style="width:50px;" class="again">重来</button>
+</body>
+
+<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+<script>
+    var buttons = document.getElementsByTagName('button');
+    // console.dir(axios);
+    // const $axios = axios.create({
+    //     baseURL: 'http://localhost:4000',
+    // })
+    // $axios.interceptors.response.use(function(response){
+    //     return JSON.parse(response);
+    // })
+
+    for (let button of buttons) {
+        const gesture = button.className;
+        button.addEventListener('click', function () {
+            /* axios.get('/game?gesture='+gesture).then(res=>{
+                console.log(res);
+                appendLi(res.data.message);
+            }).catch(e => {
+                console.log(e);
+                if(e.data) {
+                    appendLi(e.data.message);
+                }
+            }) */
+            if(gesture ==='again') {
+                document.querySelector('ul').innerHTML = '';
+            }
+            fetch('http://localhost:4000/game?gesture='+gesture, {
+                    method: 'GET', // or 'PUT'
+                    headers: new Headers({
+                        'Content-Type': 'application/json'
+                    })
+                }).then(res => res.text())
+                .catch(error => console.error('Error:', error))
+                .then(response => {
+                    console.log(JSON.stringify(response));
+                    
+                  appendLi(response); // axios在返回时，会组装成data， 而fetch不会
+
+                });
+        }, false)
+    }
+
+    function appendLi(text) {
+        var li = document.createElement('li');
+        // console.dir(li);
+        li.innerText = text;
+        var ul = document.querySelector('ul');
+        ul.appendChild(li);
+    }
+</script>
+
+</html>

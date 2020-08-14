@@ -50,7 +50,7 @@ const game = {
                 if(randomGesture === gesture) {
                     // console.log('平局');
                     fairFn(randomGesture);
-                    
+                    return Promise.resolve(0);
                 } else if(
                     (randomGesture === 'scissor' && gesture === 'cloth') ||
                     (randomGesture === 'cloth' && gesture === 'rock') ||
@@ -59,10 +59,14 @@ const game = {
                     {
                     // console.log(randomGesture+' VS ' + gesture, '你输了');
                     loseFn(randomGesture);
+                    return Promise.resolve(-1);
+
                     
                 } else {
                     // console.log(randomGesture+' VS ' + gesture, '你赢了');
                     winFn(randomGesture);
+                    return Promise.resolve(1);
+
                 }
             }
         },

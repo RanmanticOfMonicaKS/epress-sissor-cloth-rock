@@ -1,6 +1,5 @@
 const fs = require('fs');
 const http = require('http');
-const url = require('url');
 const queryString = require('querystring');
 const express = require('express');
 
@@ -16,7 +15,6 @@ game.init(
     },
     (randomGesture) => {
         console.log('你赢了---机器人出了：'+randomGesture);
-        winNum++;
         return resultNum = 1;
     },
     (randomGesture) => {
@@ -41,8 +39,7 @@ let lastGesture = '';
 let result  = {};
 
 
-
-
+// 1.通过express进行路由管理时，能够对单个接口进行单文件管理，
 
 
 // 直接管理路由
@@ -61,11 +58,15 @@ app.get('/favicon.ico',function(req,res){
         return;
 })
 
-app.get('/game',function(req,res) {
+// 2.使用中间件对复杂逻辑，进行分解。中间件即是对数据或者业务的线性分布处理，使其能够分开管理
+
+app.get('/game',function(req,res,next) {
         const query  = req.query;
         const gesture = query.gesture;
-        console.log(gesture);
-        
+        req.gesture = gesture;
+        lastGesture = gesture;
+
+        // 将geture 挂载到req上，然后拆分出，重开逻辑
         if(gesture === 'again') {
              resultNum = 0;
              winNum = 0;
@@ -75,18 +76,26 @@ app.get('/game',function(req,res) {
              res.end('重新开始吧');
              return;
         }
-        if(lastGesture && lastGesture === gesture) {
+        next();
+    },function(req, res, next) {
+
+        if(lastGesture && lastGesture === req.gesture) {
             sameCount ++;
         } else {
             sameCount = 0;
         }
-        lastGesture = gesture;
-        game.start(gesture);
+        next();
+    },
+    function(req, res, next) {
+        
+        game.start(req.gesture).then(r => {console.log(r);if(r=1){res.playWon =true;}});
+        // 中间件洋葱模型 通过这一步的判断给出参数，影响前面中间件的判断 还是通过挂载res，req属性来实现
+        if(res.playWon) winNum ++; 
         console.log(winNum,'----winNum','sameCount----',sameCount)
-        if(winNum >= 3 || sameCount>=3) {
+        if(winNum >= 3 || sameCount>3) {
             res.status(400).send('我不和你玩了')
             return;
-
+    
         } else {
             switch (resultNum) {
                 case 0:
@@ -116,8 +125,7 @@ app.get('/game',function(req,res) {
         /* res.writeHead(result.code);
         res.end(result.message); */
         res.status(result.code).send(result.message);
-
-})
+    })
 
 
 

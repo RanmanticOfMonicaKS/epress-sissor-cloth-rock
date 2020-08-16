@@ -32,7 +32,7 @@
     <button style="width:50px;" class="again">重来</button>
 </body>
 
-<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+<!-- <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script> -->
 <script>
     var buttons = document.getElementsByTagName('button');
     // console.dir(axios);
@@ -58,7 +58,7 @@
             if(gesture ==='again') {
                 document.querySelector('ul').innerHTML = '';
             }
-            fetch('http://localhost:4000/game?gesture='+gesture, {
+            fetch(window.location+'game?gesture='+gesture, {
                     method: 'GET', // or 'PUT'
                     headers: new Headers({
                         'Content-Type': 'application/json'

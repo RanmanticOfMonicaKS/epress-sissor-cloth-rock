@@ -72,6 +72,7 @@ app.use(
 )
 gameMiddleware.use(
     async function (context, next) {
+        const startTime = +new Date();
         const query = context.query;
         console.log(query);
         const gesture = query.gesture;
@@ -88,6 +89,11 @@ gameMiddleware.use(
             return;
         }
         await next();
+        const endTime = +new Date();
+        console.log('endTime---------------->', endTime);
+        console.log('startTime---------------->', startTime);
+        const lastTime = endTime - startTime;
+        console.log('lastTime--------------->', lastTime);
     }
 )
 
@@ -169,7 +175,7 @@ gameMiddleware.use(
                 context.status = result.code;
                 context.body = result.message;
                 resolve();
-            }, 100);
+            }, 500);
         })
         return;
     }
